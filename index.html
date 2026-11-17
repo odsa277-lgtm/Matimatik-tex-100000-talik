@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matematika testlari: 100 000 savol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbfdff; --grid:#d3e3f6; --ink:#1b3a8c; --ink-soft:#4a63a8;
+    --margin:#e2574c; --ok:#17794a; --ok-bg:#e3f6ec; --bad:#b3261e; --bad-bg:#fde8e6;
+    --line:#9db6e0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink); background-color:var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:24px 24px;
+    min-height:100vh; line-height:1.45;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+  header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  h1{font-size:1.25rem;margin:0;font-weight:700}
+  .score{font-size:.95rem;color:var(--ink-soft)}
+  .score b{color:var(--ink)}
+  .sheet{
+    background:var(--paper); border:2px solid var(--ink); border-radius:6px;
+    padding:20px 20px 20px 44px; position:relative;
+    box-shadow:4px 4px 0 var(--line);
+  }
+  .sheet::before{content:"";position:absolute;left:28px;top:0;bottom:0;width:2px;background:var(--margin);opacity:.7}
+  .meta{display:flex;gap:16px;flex-wrap:wrap;font-size:.9rem;color:var(--ink-soft);margin:0 0 10px}
+  .meta b{color:var(--ink)}
+  #q{font-size:1.45rem;line-height:1.35;margin:0 0 18px;font-weight:500;min-height:2.7em}
+  #opts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  .opt{
+    width:100%;display:flex;align-items:center;gap:12px;text-align:left;
+    font:inherit;font-size:1.1rem;color:var(--ink);background:#fff;
+    border:2px solid var(--line);border-radius:6px;padding:12px 14px;cursor:pointer;
+  }
+  .opt:hover:not(:disabled){border-color:var(--ink)}
+  .opt:focus-visible,.btn:focus-visible,#jump:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+  .opt .letter{
+    flex:none;width:30px;height:30px;border-radius:50%;border:2px solid currentColor;
+    display:grid;place-items:center;font-weight:700;font-size:.9rem;
+  }
+  .opt .mark{margin-left:auto;font-weight:700}
+  .opt:disabled{cursor:default}
+  .opt.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+  .opt.bad{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  #fb{min-height:1.6em;margin:14px 0 0;font-weight:700}
+  #fb.ok{color:var(--ok)} #fb.bad{color:var(--bad)}
+  .nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+  .btn{
+    font:inherit;font-weight:500;color:var(--ink);background:#fff;
+    border:2px solid var(--ink);border-radius:6px;padding:9px 16px;cursor:pointer;
+  }
+  .btn:hover{background:var(--ink);color:#fff}
+  .btn.primary{background:var(--ink);color:#fff}
+  .btn.primary:hover{background:#12296b}
+  .jump{display:flex;gap:8px;align-items:center;margin-top:18px;flex-wrap:wrap}
+  .jump label{font-size:.9rem;color:var(--ink-soft)}
+  #jump{
+    font:inherit;width:9em;padding:8px 10px;border:2px solid var(--line);border-radius:6px;
+    color:var(--ink);background:#fff;
+  }
+  footer{margin-top:20px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.85rem;color:var(--ink-soft)}
+  footer button{font:inherit;font-size:.85rem;background:none;border:none;color:var(--ink-soft);text-decoration:underline;cursor:pointer;padding:0}
+  @media (max-width:480px){
+    .sheet{padding:16px 14px 16px 36px}
+    .sheet::before{left:22px}
+    #q{font-size:1.25rem}
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .opt{transition:border-color .12s,background-color .12s}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Matematika testlari</h1>
+    <div class="score">To'g'ri: <b id="sOk">0</b> &nbsp; Xato: <b id="sBad">0</b></div>
+  </header>
+
+  <main class="sheet" aria-live="polite">
+    <p class="meta"><span>Savol <b id="num">1</b> / 100 000</span><span id="topic"></span></p>
+    <h2 id="q"></h2>
+    <ol id="opts"></ol>
+    <p id="fb"></p>
+    <div class="nav">
+      <button class="btn" id="prev">Oldingi</button>
+      <button class="btn primary" id="next">Keyingi</button>
+      <button class="btn" id="rand">Tasodifiy savol</button>
+    </div>
+    <div class="jump">
+      <label for="jump">Savol raqamiga o'tish</label>
+      <input id="jump" type="number" min="1" max="100000" inputmode="numeric" placeholder="1 – 100 000">
+      <button class="btn" id="go">O'tish</button>
+    </div>
+  </main>
+
+  <footer>
+    <span>Klaviatura: 1–4 yoki A–D javob, ← → savollar</span>
+    <button id="reset">Natijalarni tozalash</button>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var TOTAL = 100000;
+
+  /* ---------- Seeded random: har bir savol raqamidan bir xil savol chiqadi ---------- */
+  function rng(seed){
+    var t = seed >>> 0;
+    var f = function(){
+      t = (t + 0x6D2B79F5) >>> 0;
+      var x = Math.imul(t ^ (t >>> 15), t | 1);
+      x ^= x + Math.imul(x ^ (x >>> 7), x | 61);
+      return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+    };
+    f.int = function(a,b){ return a + Math.floor(f()*(b-a+1)); };
+    f.pick = function(arr){ return arr[Math.floor(f()*arr.length)]; };
+    return f;
+  }
+  function fmt(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0"); }
+  function gcd(a,b){ return b ? gcd(b, a % b) : a; }
+
+  /* ---------- Mavzular (har biri savol matni va to'g'ri javob qaytaradi) ---------- */
+  var names = ["Ali","Vali","Zilola","Madina","Sardor","Dilnoza","Jasur","Nigora","Bobur","Malika"];
+  var things = ["olma","qalam","daftar","kitob","anor","nok"];
+  var topics = [
+    ["Qo'shish", function(r){ var a=r.int(100,9999), b=r.int(100,9999); return {q:fmt(a)+" + "+fmt(b)+" nechaga teng?", a:a+b}; }],
+    ["Ayirish", function(r){ var a=r.int(500,9999), b=r.int(100,a-1); return {q:fmt(a)+" − "+fmt(b)+" nechaga teng?", a:a-b}; }],
+    ["Ko'paytirish", function(r){ var a=r.int(12,99), b=r.int(11,99); return {q:a+" × "+b+" nechaga teng?", a:a*b}; }],
+    ["Bo'lish", function(r){ var b=r.int(2,25), k=r.int(11,99); return {q:fmt(b*k)+" ÷ "+b+" nechaga teng?", a:k}; }],
+    ["Chiziqli tenglama", function(r){ var a=r.int(2,12), x=r.int(1,30), b=r.int(1,50); return {q:a+"x + "+b+" = "+(a*x+b)+" bo'lsa, x nechaga teng?", a:x}; }],
+    ["Foiz", function(r){ var p=r.pick([5,10,15,20,25,30,40,50,60,75]), n=20*r.int(1,150); return {q:fmt(n)+" ning "+p+" foizi nechaga teng?", a:p*n/100}; }],
+    ["To'g'ri to'rtburchak yuzi", function(r){ var a=r.int(3,60), b=r.int(2,40); return {q:"Tomonlari "+a+" va "+b+" bo'lgan to'g'ri to'rtburchakning yuzi nechaga teng?", a:a*b}; }],
+    ["To'g'ri to'rtburchak perimetri", function(r){ var a=r.int(3,90), b=r.int(2,70); return {q:"Tomonlari "+a+" va "+b+" bo'lgan to'g'ri to'rtburchakning perimetri nechaga teng?", a:2*(a+b)}; }],
+    ["Pifagor teoremasi", function(r){
+      var t=r.pick([[3,4,5],[5,12,13],[8,15,17],[7,24,25],[20,21,29]]), m=r.int(1,12), s=t.map(function(v){return v*m;});
+      if(r.int(0,1)) return {q:"Katetlari "+s[0]+" va "+s[1]+" bo'lgan to'g'ri burchakli uchburchakning gipotenuzasi nechaga teng?", a:s[2]};
+      return {q:"To'g'ri burchakli uchburchakning gipotenuzasi "+s[2]+", katetlaridan biri "+s[0]+". Ikkinchi katet nechaga teng?", a:s[1]};
+    }],
+    ["Daraja", function(r){ var b=r.int(2,9), e=r.int(2,5); return {q:b+(["","","²","³","⁴","⁵"][e])+" nechaga teng?", a:Math.pow(b,e)}; }],
+    ["Kvadrat ildiz", function(r){ var k=r.int(11,99); return {q:"√"+fmt(k*k)+" nechaga teng?", a:k}; }],
+    ["Arifmetik progressiya", function(r){ var a=r.int(1,40), d=r.int(2,15), n=r.int(8,60); return {q:"Arifmetik progressiyada birinchi had "+a+", ayirma "+d+". Uning "+n+"-hadi nechaga teng?", a:a+(n-1)*d}; }],
+    ["O'rta arifmetik", function(r){
+      var v=[r.int(1,99),r.int(1,99),r.int(1,99),r.int(1,99)], s=v[0]+v[1]+v[2]+v[3], need=(5-(s%5))%5, e=need+5*r.int(0,15);
+      v.push(e); s+=e; return {q:v.join(", ")+" sonlarining o'rta arifmetigi nechaga teng?", a:s/5};
+    }],
+    ["Uchburchak burchaklari", function(r){ var a=r.int(20,80), b=r.int(20,100-1); if(a+b>=175) b=30; return {q:"Uchburchakning ikki burchagi "+a+"° va "+b+"°. Uchinchi burchagi necha gradus?", a:180-a-b}; }],
+    ["Tezlik, vaqt, masofa", function(r){ var v=r.int(20,120), t=r.int(2,12); return {q:"Avtomobil soatiga "+v+" km tezlik bilan "+t+" soat yurdi. U necha km yo'l bosdi?", a:v*t}; }],
+    ["EKUB", function(r){ var g=r.int(2,15), m=r.int(2,14), n=r.int(2,14), a=g*m, b=g*n; return {q:a+" va "+b+" sonlarining eng katta umumiy bo'luvchisi (EKUB) nechaga teng?", a:gcd(a,b)}; }],
+    ["EKUK", function(r){ var a=r.int(4,40), b=r.int(4,40); return {q:a+" va "+b+" sonlarining eng kichik umumiy karralisi (EKUK) nechaga teng?", a:a*b/gcd(a,b)}; }],
+    ["Kvadrat tenglama", function(r){ var p=r.int(1,20), q=r.int(1,20); if(p===q) q=p+1; return {q:"x² − "+(p+q)+"x + "+(p*q)+" = 0 tenglamaning katta ildizi nechaga teng?", a:Math.max(p,q)}; }],
+    ["Sonlar yig'indisi", function(r){ var n=r.int(10,300); return {q:"1 dan "+n+" gacha bo'lgan natural sonlar yig'indisi nechaga teng?", a:n*(n+1)/2}; }],
+    ["Kvadrat perimetri", function(r){ var k=r.int(3,99); return {q:"Kvadratning yuzi "+fmt(k*k)+" ga teng. Uning perimetri nechaga teng?", a:4*k}; }],
+    ["Masala", function(r){
+      var n1=r.pick(names), n2=r.pick(names); if(n1===n2) n2=names[(names.indexOf(n1)+1)%names.length];
+      var a=r.int(5,90), b=r.int(2,40), th=r.pick(things);
+      return {q:n1+"da "+a+" ta "+th+" bor. "+n2+"da "+n1+"dagidan "+b+" ta ko'p. Ikkalasida jami nechta "+th+" bor?", a:2*a+b};
+    }]
+  ];
+
+  /* ---------- Noto'g'ri variantlar ---------- */
+  function distract(ans, r){
+    var set = [ans], step = Math.max(2, Math.round(Math.abs(ans)*0.08));
+    var pool = [1,-1,2,-2,3,-3,5,-5,10,-10,step,-step,2*step,-2*step,3*step,-3*step];
+    var tries = 0;
+    while(set.length < 4){
+      tries++;
+      var d = ans + r.pick(pool) + (tries > 20 ? r.int(1,30)*(r.int(0,1)?1:-1) : 0);
+      if(ans >= 0 && d < 0) continue;
+      if(set.indexOf(d) === -1) set.push(d);
+      if(tries > 200) set.push(ans + set.length*37 + tries);
+    }
+    return set;
+  }
+  function shuffle(a, r){
+    for(var i=a.length-1;i>0;i--){ var j=Math.floor(r()*(i+1)), t=a[i]; a[i]=a[j]; a[j]=t; }
+    return a;
+  }
+
+  function makeQuestion(n){
+    var r = rng(Math.imul(n, 2654435761) ^ 0x9E3779B9);
+    r(); r();
+    var t = topics[(n-1) % topics.length];
+    var o = t[1](r);
+    var opts = shuffle(distract(o.a, r), r);
+    return {q:o.q, topic:t[0], opts:opts, correct:opts.indexOf(o.a)};
+  }
+
+  /* ---------- Holat (brauzerda saqlanadi) ---------- */
+  var KEY = "matematika100k";
+  var state = {i:1, ans:{}, ok:0, bad:0};
+  try{
+    var saved = JSON.parse(localStorage.getItem(KEY) || "null");
+    if(saved && saved.i) state = saved;
+  }catch(e){}
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+  var $ = function(id){ return document.getElementById(id); };
+  var cur = null;
+
+  function render(){
+    var n = state.i;
+    cur = makeQuestion(n);
+    $("num").textContent = fmt(n);
+    $("topic").textContent = cur.topic;
+    $("q").textContent = cur.q;
+    $("sOk").textContent = state.ok;
+    $("sBad").textContent = state.bad;
+    var chosen = state.ans[n];
+    var list = $("opts");
+    list.innerHTML = "";
+    cur.opts.forEach(function(v, idx){
+      var li = document.createElement("li");
+      var b = document.createElement("button");
+      b.className = "opt"; b.type = "button";
+      b.innerHTML = '<span class="letter">'+"ABCD"[idx]+'</span><span>'+fmt(v)+'</span><span class="mark"></span>';
+      b.addEventListener("click", function(){ answer(idx); });
+      if(chosen !== undefined){
+        b.disabled = true;
+        if(idx === cur.correct){ b.classList.add("ok"); b.lastChild.textContent = "✓"; }
+        else if(idx === chosen){ b.classList.add("bad"); b.lastChild.textContent = "✗"; }
+      }
+      li.appendChild(b); list.appendChild(li);
+    });
+    var fb = $("fb");
+    if(chosen === undefined){ fb.textContent = ""; fb.className = ""; }
+    else if(chosen === cur.correct){ fb.textContent = "To'g'ri!"; fb.className = "ok"; }
+    else { fb.textContent = "Noto'g'ri. To'g'ri javob: " + "ABCD"[cur.correct] + ") " + fmt(cur.opts[cur.correct]); fb.className = "bad"; }
+    $("prev").disabled = n <= 1;
+    $("next").disabled = n >= TOTAL;
+    save();
+  }
+
+  function answer(idx){
+    if(state.ans[state.i] !== undefined) return;
+    state.ans[state.i] = idx;
+    if(idx === cur.correct) state.ok++; else state.bad++;
+    render();
+  }
+  function go(n){
+    n = Math.max(1, Math.min(TOTAL, n|0));
+    state.i = n; render();
+  }
+
+  $("prev").addEventListener("click", function(){ go(state.i-1); });
+  $("next").addEventListener("click", function(){ go(state.i+1); });
+  $("rand").addEventListener("click", function(){ go(1 + Math.floor(Math.random()*TOTAL)); });
+  $("go").addEventListener("click", function(){ var v = parseInt($("jump").value,10); if(v) go(v); });
+  $("jump").addEventListener("keydown", function(e){ if(e.key === "Enter"){ var v = parseInt($("jump").value,10); if(v) go(v); } });
+  $("reset").addEventListener("click", function(){
+    if(confirm("Barcha natijalar o'chiriladi. Davom etasizmi?")){
+      state = {i:1, ans:{}, ok:0, bad:0}; render();
+    }
+  });
+  document.addEventListener("keydown", function(e){
+    if(e.target && e.target.id === "jump") return;
+    var k = e.key.toLowerCase(), idx = "1234".indexOf(k);
+    if(idx < 0) idx = "abcd".indexOf(k);
+    if(idx >= 0 && k.length === 1){ answer(idx); return; }
+    if(e.key === "ArrowRight") go(state.i+1);
+    else if(e.key === "ArrowLeft") go(state.i-1);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
